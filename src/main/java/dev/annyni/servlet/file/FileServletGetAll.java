@@ -16,20 +16,19 @@ import java.util.List;
 public class FileServletGetAll extends HttpServlet {
 
     private final FileService fileService = FileService.getInstance();
+    private static final ObjectMapper objectMapper = new ObjectMapper();
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         List<File> files = fileService.getAll();
 
+        resp.setContentType("application/json");
+        resp.setCharacterEncoding("UTF-8");
+
         if (!files.isEmpty()){
-            ObjectMapper objectMapper = new ObjectMapper();
-
-            resp.setContentType("application/json");
-            resp.setCharacterEncoding("UTF-8");
-
             objectMapper.writeValue(resp.getWriter(), files);
         } else {
-            resp.setStatus(HttpServletResponse.SC_NO_CONTENT);
+            resp.setStatus(HttpServletResponse.SC_NOT_FOUND);
         }
 
     }

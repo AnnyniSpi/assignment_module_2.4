@@ -2,11 +2,7 @@ package dev.annyni.servlet.event;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import dev.annyni.entity.Event;
-import dev.annyni.entity.File;
-import dev.annyni.entity.User;
 import dev.annyni.service.EventService;
-import dev.annyni.service.FileService;
-import dev.annyni.service.UserService;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
@@ -20,8 +16,7 @@ import java.util.Optional;
 public class EventServlet extends HttpServlet {
 
     private final EventService eventService = EventService.getInstance();
-    private final UserService userService = UserService.getInstance();
-    private final FileService fileService = FileService.getInstance();
+    private static final ObjectMapper objectMapper = new ObjectMapper();
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
@@ -32,8 +27,6 @@ public class EventServlet extends HttpServlet {
         if (event.isPresent()){
             resp.setStatus(HttpServletResponse.SC_OK);
 
-            ObjectMapper objectMapper = new ObjectMapper();
-
             resp.setContentType("application/json");
             resp.setCharacterEncoding("UTF-8");
 
@@ -43,30 +36,17 @@ public class EventServlet extends HttpServlet {
 
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        String userIdString = req.getParameter("userId");
-        String fileIdString = req.getParameter("fileId");
-        int userId = Integer.parseInt(userIdString);
-        int fileId = Integer.parseInt(fileIdString);
+        Event readValue = objectMapper.readValue(req.getInputStream(), Event.class);
 
-        Optional<User> user = userService.getById(userId);
-        Optional<File> file = fileService.getById(fileId);
+        resp.setContentType("application/json");
+        resp.setCharacterEncoding("UTF-8");
 
-        if (user.isPresent() && file.isPresent()) {
-            Event event = Event.builder()
-                    .user(user.get())
-                    .file(file.get())
-                    .build();
-
-            eventService.create(event);
+        if (readValue != null) {
+            Event event = eventService.create(readValue);
 
             resp.setStatus(HttpServletResponse.SC_CREATED);
 
-            ObjectMapper objectMapper = new ObjectMapper();
-
-            resp.setContentType("application/json");
-            resp.setCharacterEncoding("UTF-8");
-
-            objectMapper.writeValue(resp.getWriter(), file.get());
+            objectMapper.writeValue(resp.getWriter(), event);
         } else {
             resp.setStatus(HttpServletResponse.SC_NOT_FOUND);
         }
@@ -74,16 +54,15 @@ public class EventServlet extends HttpServlet {
 
     @Override
     protected void doPut(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        Integer id = getId(req, resp);
+//        Integer id = getId(req, resp);
+        Event readValue = objectMapper.readValue(req.getInputStream(), Event.class);
 
-        Optional<Event> event = eventService.getById(id);
+        resp.setContentType("application/json");
+        resp.setCharacterEncoding("UTF-8");
+
+        Optional<Event> event = eventService.getById(readValue.getId());
         if (event.isPresent()){
             eventService.update(event.get());
-
-            ObjectMapper objectMapper = new ObjectMapper();
-
-            resp.setContentType("application/json");
-            resp.setCharacterEncoding("UTF-8");
 
             objectMapper.writeValue(resp.getWriter(), event.get());
         } else {
@@ -98,7 +77,6 @@ public class EventServlet extends HttpServlet {
         Optional<Event> event = eventService.getById(id);
         if (event.isPresent()){
             eventService.delete(id);
-
             resp.setStatus(HttpServletResponse.SC_NO_CONTENT);
         } else {
             resp.setStatus(HttpServletResponse.SC_NOT_FOUND);

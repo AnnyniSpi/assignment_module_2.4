@@ -17,20 +17,19 @@ import java.util.List;
 public class EventServletGetAll extends HttpServlet {
 
     private final EventService eventService = EventService.getInstance();
+    private static final ObjectMapper objectMapper = new ObjectMapper();
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         List<Event> events = eventService.getAll();
 
+        resp.setContentType("application/json");
+        resp.setCharacterEncoding("UTF-8");
+
         if (!events.isEmpty()){
-            ObjectMapper objectMapper = new ObjectMapper();
-
-            resp.setContentType("application/json");
-            resp.setCharacterEncoding("UTF-8");
-
             objectMapper.writeValue(resp.getWriter(), events);
         } else {
-            resp.setStatus(HttpServletResponse.SC_NO_CONTENT);
+            resp.setStatus(HttpServletResponse.SC_NOT_FOUND);
         }
 
     }

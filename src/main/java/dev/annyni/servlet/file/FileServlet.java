@@ -1,6 +1,7 @@
 package dev.annyni.servlet.file;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import dev.annyni.entity.Event;
 import dev.annyni.entity.File;
 import dev.annyni.service.FileService;
 import jakarta.servlet.ServletException;
@@ -16,6 +17,7 @@ import java.util.Optional;
 public class FileServlet extends HttpServlet {
 
     private final FileService fileService = FileService.getInstance();
+    private static final ObjectMapper objectMapper = new ObjectMapper();
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
@@ -25,8 +27,6 @@ public class FileServlet extends HttpServlet {
 
         if (file.isPresent()) {
             resp.setStatus(HttpServletResponse.SC_OK);
-
-            ObjectMapper objectMapper = new ObjectMapper();
 
             resp.setContentType("application/json");
             resp.setCharacterEncoding("UTF-8");
@@ -55,18 +55,18 @@ public class FileServlet extends HttpServlet {
 
     @Override
     protected void doPut(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        Integer id = getId(req, resp);
+        File readValue = objectMapper.readValue(req.getInputStream(), File.class);
 
-        Optional<File> file = fileService.getById(id);
+        Optional<File> file = fileService.getById(readValue.getId());
+
+        resp.setContentType("application/json");
+        resp.setCharacterEncoding("UTF-8");
+
         if(file.isPresent()){
-            fileService.update(file.get());
-
-            ObjectMapper objectMapper = new ObjectMapper();
-
-            resp.setContentType("application/json");
-            resp.setCharacterEncoding("UTF-8");
-
-            objectMapper.writeValue(resp.getWriter(), file.get());
+            File update = fileService.update(file.get());
+            objectMapper.writeValue(resp.getWriter(), update);
+        } else {
+            resp.setStatus(HttpServletResponse.SC_NOT_FOUND);
         }
     }
 

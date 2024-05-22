@@ -1,6 +1,8 @@
 package dev.annyni.servlet.user;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import dev.annyni.entity.Event;
+import dev.annyni.entity.File;
 import dev.annyni.entity.User;
 import dev.annyni.service.UserService;
 import jakarta.servlet.ServletException;
@@ -17,6 +19,7 @@ import java.util.Optional;
 public class UserServlet extends HttpServlet {
 
     private final UserService userService = UserService.getInstance();
+    private static final ObjectMapper objectMapper = new ObjectMapper();
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
@@ -25,8 +28,6 @@ public class UserServlet extends HttpServlet {
         Optional<User> user = userService.getById(id);
         if (user.isPresent()){
             resp.setStatus(HttpServletResponse.SC_OK);
-
-            ObjectMapper objectMapper = new ObjectMapper();
 
             resp.setContentType("application/json");
             resp.setCharacterEncoding("UTF-8");
@@ -37,39 +38,36 @@ public class UserServlet extends HttpServlet {
 
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        String name = req.getParameter("name");
+        User readValue = objectMapper.readValue(req.getInputStream(), User.class);
 
-        User user = User.builder()
-                .name(name)
-                .build();
+        resp.setContentType("application/json");
+        resp.setCharacterEncoding("UTF-8");
 
-        userService.create(user);
+        if (readValue != null) {
+            User user = userService.create(readValue);
+            resp.setStatus(HttpServletResponse.SC_CREATED);
 
-        resp.setStatus(HttpServletResponse.SC_CREATED);
-
-        ObjectMapper mapper = new ObjectMapper();
-        String json = mapper.writeValueAsString(user);
-
-        try (PrintWriter writer = resp.getWriter()) {
-            writer.write(json);
+            objectMapper.writeValue(resp.getWriter(), user);
+        } else {
+            resp.setStatus(HttpServletResponse.SC_NOT_FOUND);
         }
-
     }
 
     @Override
     protected void doPut(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        Integer id = getId(req, resp);
+        User readValue = objectMapper.readValue(req.getInputStream(), User.class);
 
-        Optional<User> user = userService.getById(id);
+        resp.setContentType("application/json");
+        resp.setCharacterEncoding("UTF-8");
+
+        Optional<User> user = userService.getById(readValue.getId());
         if (user.isPresent()){
-            userService.update(user.get());
-
-            ObjectMapper objectMapper = new ObjectMapper();
+            User update = userService.update(user.get());
 
             resp.setContentType("application/json");
             resp.setCharacterEncoding("UTF-8");
 
-            objectMapper.writeValue(resp.getWriter(), user.get());
+            objectMapper.writeValue(resp.getWriter(), update);
         }
     }
 
