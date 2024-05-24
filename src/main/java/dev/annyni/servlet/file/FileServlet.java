@@ -37,19 +37,19 @@ public class FileServlet extends HttpServlet {
 
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        File file = File.builder()
-                .name(req.getParameter("name"))
-                .filePath(req.getParameter("path"))
-                .build();
+        File readValue = objectMapper.readValue(req.getInputStream(), File.class);
 
-        fileService.create(file);
+        resp.setContentType("application/json");
+        resp.setCharacterEncoding("UTF-8");
 
-        System.out.println(file);
+        if (readValue != null) {
+            File file = fileService.create(readValue);
 
-        resp.setStatus(HttpServletResponse.SC_CREATED);
+            resp.setStatus(HttpServletResponse.SC_CREATED);
 
-        try (PrintWriter writer = resp.getWriter()) {
-            writer.write(file.getId());
+            objectMapper.writeValue(resp.getWriter(), file);
+        } else {
+            resp.setStatus(HttpServletResponse.SC_NOT_FOUND);
         }
     }
 
@@ -57,13 +57,16 @@ public class FileServlet extends HttpServlet {
     protected void doPut(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         File readValue = objectMapper.readValue(req.getInputStream(), File.class);
 
-        Optional<File> file = fileService.getById(readValue.getId());
+        System.out.println();
 
         resp.setContentType("application/json");
         resp.setCharacterEncoding("UTF-8");
 
-        if(file.isPresent()){
-            File update = fileService.update(file.get());
+        if(readValue != null){
+            File update = fileService.update(readValue);
+
+            System.out.println(update);
+
             objectMapper.writeValue(resp.getWriter(), update);
         } else {
             resp.setStatus(HttpServletResponse.SC_NOT_FOUND);

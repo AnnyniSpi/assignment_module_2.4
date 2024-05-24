@@ -18,10 +18,3 @@ CREATE TABLE event
     file_id   BIGINT REFERENCES file (id)
 
 );
-
-CREATE TABLE users_event
-(
-    user_id INT REFERENCES users (id),
-    event_id INT REFERENCES event (id),
-    PRIMARY KEY (user_id, event_id)
-);

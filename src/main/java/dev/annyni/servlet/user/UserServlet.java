@@ -60,9 +60,8 @@ public class UserServlet extends HttpServlet {
         resp.setContentType("application/json");
         resp.setCharacterEncoding("UTF-8");
 
-        Optional<User> user = userService.getById(readValue.getId());
-        if (user.isPresent()){
-            User update = userService.update(user.get());
+        if (readValue != null){
+            User update = userService.update(readValue);
 
             resp.setContentType("application/json");
             resp.setCharacterEncoding("UTF-8");

@@ -19,11 +19,14 @@ public class User {
     private Integer id;
     private String name;
 
-    @OneToMany
-    @JoinTable(
-            name = "users_event",
-            joinColumns = @JoinColumn(name = "user_id"),
-            inverseJoinColumns = @JoinColumn(name = "event_id")
-    )
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
     private List<Event> events;
+
+    public void addEvent(Event event){
+        this.events.add(event);
+    }
+
+    public void removeEvent(Event event){
+        this.events.remove(event);
+    }
 }

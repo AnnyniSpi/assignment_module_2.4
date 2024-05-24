@@ -18,8 +18,10 @@ public class Event {
     private Integer id;
 
     @ManyToOne(fetch = FetchType.LAZY,cascade = CascadeType.MERGE)
+    @JoinColumn(name = "user_id", referencedColumnName = "id")
     private User user;
 
     @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.MERGE)
+    @JoinColumn(name = "file_id", referencedColumnName = "id")
     private File file;
 }
