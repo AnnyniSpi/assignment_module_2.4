@@ -5,19 +5,15 @@ import dev.annyni.dao.impl.EventDaoImpl;
 import dev.annyni.entity.Event;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
+import lombok.RequiredArgsConstructor;
+
 import java.util.List;
 import java.util.Optional;
 
-@NoArgsConstructor(access = AccessLevel.PRIVATE)
+@RequiredArgsConstructor
 public class EventService {
 
-    private final EventDao eventDao = EventDaoImpl.getInstance();
-
-    private static final EventService INSTANCE = new EventService();
-
-    public static EventService getInstance(){
-        return INSTANCE;
-    }
+    private final EventDao eventDao;
 
     public Event create(Event entity){
         return eventDao.save(entity);

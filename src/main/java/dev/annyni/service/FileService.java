@@ -5,19 +5,15 @@ import dev.annyni.dao.impl.FileDaoImpl;
 import dev.annyni.entity.File;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
+import lombok.RequiredArgsConstructor;
+
 import java.util.List;
 import java.util.Optional;
 
-@NoArgsConstructor(access = AccessLevel.PRIVATE)
+@RequiredArgsConstructor
 public class FileService {
 
-    private final FileDao fileDao = FileDaoImpl.getInstance();
-
-    private static final FileService INSTANCE = new FileService();
-
-    public static FileService getInstance(){
-        return INSTANCE;
-    }
+    private final FileDao fileDao;
 
     public File create(File entity){
         return fileDao.save(entity);

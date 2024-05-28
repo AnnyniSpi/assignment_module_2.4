@@ -1,21 +1,26 @@
 package dev.annyni.servlet.file;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import dev.annyni.dao.FileDao;
+import dev.annyni.dao.impl.FileDaoImpl;
 import dev.annyni.entity.File;
+import dev.annyni.service.EventService;
 import dev.annyni.service.FileService;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import lombok.RequiredArgsConstructor;
 
 import java.io.IOException;
 import java.util.List;
 
 @WebServlet("/files")
+@RequiredArgsConstructor
 public class FileServletGetAll extends HttpServlet {
 
-    private final FileService fileService = FileService.getInstance();
+    private final FileService fileService = createService();
     private static final ObjectMapper objectMapper = new ObjectMapper();
 
     @Override
@@ -31,5 +36,10 @@ public class FileServletGetAll extends HttpServlet {
             resp.setStatus(HttpServletResponse.SC_NOT_FOUND);
         }
 
+    }
+
+    private static FileService createService() {
+        FileDao fileDao = new FileDaoImpl();
+        return new FileService(fileDao);
     }
 }

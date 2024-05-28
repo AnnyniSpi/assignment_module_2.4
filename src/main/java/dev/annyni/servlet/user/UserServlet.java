@@ -1,24 +1,31 @@
 package dev.annyni.servlet.user;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import dev.annyni.dao.FileDao;
+import dev.annyni.dao.UserDao;
+import dev.annyni.dao.impl.FileDaoImpl;
+import dev.annyni.dao.impl.UserDaoImpl;
 import dev.annyni.entity.Event;
 import dev.annyni.entity.File;
 import dev.annyni.entity.User;
+import dev.annyni.service.FileService;
 import dev.annyni.service.UserService;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import lombok.RequiredArgsConstructor;
 
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.Optional;
 
 @WebServlet("/user")
+@RequiredArgsConstructor
 public class UserServlet extends HttpServlet {
 
-    private final UserService userService = UserService.getInstance();
+    private final UserService userService = createService();
     private static final ObjectMapper objectMapper = new ObjectMapper();
 
     @Override
@@ -87,6 +94,11 @@ public class UserServlet extends HttpServlet {
     static Integer getId(HttpServletRequest req, HttpServletResponse resp) {
         String fileIdString = req.getParameter("id");
         return Integer.parseInt(fileIdString);
+    }
+
+    private static UserService createService() {
+        UserDao userDao = new UserDaoImpl();
+        return new UserService(userDao);
     }
 
 }

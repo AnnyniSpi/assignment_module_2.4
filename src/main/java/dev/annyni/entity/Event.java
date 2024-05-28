@@ -6,6 +6,10 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+@NamedEntityGraph(
+        name = "graph.eventUserAndFile",
+        attributeNodes = {@NamedAttributeNode("user"), @NamedAttributeNode("file")}
+)
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
@@ -17,11 +21,11 @@ public class Event {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
-    @ManyToOne(fetch = FetchType.LAZY,cascade = CascadeType.MERGE)
+    @ManyToOne
     @JoinColumn(name = "user_id", referencedColumnName = "id")
     private User user;
 
-    @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.MERGE)
+    @ManyToOne
     @JoinColumn(name = "file_id", referencedColumnName = "id")
     private File file;
 }

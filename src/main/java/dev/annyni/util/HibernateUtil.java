@@ -3,10 +3,12 @@ package dev.annyni.util;
 import dev.annyni.entity.Event;
 import dev.annyni.entity.File;
 import dev.annyni.entity.User;
+import jakarta.persistence.EntityManager;
 import lombok.experimental.UtilityClass;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.cfg.Configuration;
+import org.hibernate.internal.SessionImpl;
 
 @UtilityClass
 public class HibernateUtil {

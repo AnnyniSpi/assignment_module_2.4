@@ -5,20 +5,15 @@ import dev.annyni.dao.impl.UserDaoImpl;
 import dev.annyni.entity.User;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
+import lombok.RequiredArgsConstructor;
+
 import java.util.List;
 import java.util.Optional;
 
-@NoArgsConstructor(access = AccessLevel.PRIVATE)
+@RequiredArgsConstructor
 public class UserService {
 
-    private final UserDao userDao = UserDaoImpl.getInstance();
-
-    private static final UserService INSTANCE = new UserService();
-
-    public static UserService getInstance(){
-        return INSTANCE;
-    }
-
+    private final UserDao userDao;
 
     public User create(User entity){
         return userDao.save(entity);

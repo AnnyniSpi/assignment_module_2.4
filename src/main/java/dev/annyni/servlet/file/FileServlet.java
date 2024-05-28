@@ -1,6 +1,8 @@
 package dev.annyni.servlet.file;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import dev.annyni.dao.FileDao;
+import dev.annyni.dao.impl.FileDaoImpl;
 import dev.annyni.entity.Event;
 import dev.annyni.entity.File;
 import dev.annyni.service.FileService;
@@ -9,14 +11,17 @@ import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import lombok.RequiredArgsConstructor;
+
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.Optional;
 
 @WebServlet("/file")
+@RequiredArgsConstructor
 public class FileServlet extends HttpServlet {
 
-    private final FileService fileService = FileService.getInstance();
+    private final FileService fileService = createService();
     private static final ObjectMapper objectMapper = new ObjectMapper();
 
     @Override
@@ -87,9 +92,14 @@ public class FileServlet extends HttpServlet {
         }
     }
 
-    static Integer getId(HttpServletRequest req, HttpServletResponse resp) {
+    private static Integer getId(HttpServletRequest req, HttpServletResponse resp) {
         String fileIdString = req.getParameter("id");
         return Integer.parseInt(fileIdString);
+    }
+
+    private static FileService createService() {
+        FileDao fileDao = new FileDaoImpl();
+        return new FileService(fileDao);
     }
 
 }

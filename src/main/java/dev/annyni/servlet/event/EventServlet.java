@@ -1,6 +1,8 @@
 package dev.annyni.servlet.event;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import dev.annyni.dao.EventDao;
+import dev.annyni.dao.impl.EventDaoImpl;
 import dev.annyni.entity.Event;
 import dev.annyni.entity.File;
 import dev.annyni.entity.User;
@@ -10,14 +12,16 @@ import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import lombok.RequiredArgsConstructor;
 
 import java.io.IOException;
 import java.util.Optional;
 
 @WebServlet("/event")
+@RequiredArgsConstructor
 public class EventServlet extends HttpServlet {
 
-    private final EventService eventService = EventService.getInstance();
+    private final EventService eventService = createService();
     private static final ObjectMapper objectMapper = new ObjectMapper();
 
     @Override
@@ -39,10 +43,6 @@ public class EventServlet extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         Event readValue = objectMapper.readValue(req.getInputStream(), Event.class);
-
-        System.out.println();
-        User user = readValue.getUser();
-        File file = readValue.getFile();
 
         resp.setContentType("application/json");
         resp.setCharacterEncoding("UTF-8");
@@ -91,5 +91,10 @@ public class EventServlet extends HttpServlet {
     static Integer getId(HttpServletRequest req, HttpServletResponse resp) {
         String fileIdString = req.getParameter("id");
         return Integer.parseInt(fileIdString);
+    }
+
+    private static EventService createService() {
+        EventDao eventDao = new EventDaoImpl();
+        return new EventService(eventDao);
     }
 }

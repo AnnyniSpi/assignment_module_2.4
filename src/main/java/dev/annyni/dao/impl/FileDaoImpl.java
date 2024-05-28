@@ -11,25 +11,11 @@ import java.util.Optional;
 
 public class FileDaoImpl implements FileDao {
 
-    private static final FileDaoImpl INSTANCE = new FileDaoImpl();
-
-    private FileDaoImpl(){}
-
-    public static FileDaoImpl getInstance(){
-        return INSTANCE;
-    }
-
     @Override
     public List<File> findAll() {
         try(Session session = HibernateUtil.openSession()){
-            session.beginTransaction();
-
-            List<File> files = session.createQuery("select f from File f", File.class)
+            List<File> files = session.createQuery("From File", File.class)
                     .getResultList();
-
-            System.out.println(files);
-
-            session.getTransaction().commit();
 
             return files;
         } catch (Exception e){
@@ -40,16 +26,12 @@ public class FileDaoImpl implements FileDao {
     @Override
     public Optional<File> findByID(Integer id) {
         try(Session session = HibernateUtil.openSession()){
-            session.beginTransaction();
 
             File file = session.get(File.class, id);
-
-            session.getTransaction().commit();
 
             return Optional.ofNullable(file);
 
         } catch (Exception e){
-            e.printStackTrace();
             throw new RuntimeException("Error find by id entity! " + id);
         }
     }
@@ -57,8 +39,6 @@ public class FileDaoImpl implements FileDao {
     @Override
     public boolean delete(Integer id) {
         try(Session session = HibernateUtil.openSession()) {
-            session.beginTransaction();
-
             boolean result = true;
 
             File file = session.get(File.class, id);
@@ -71,8 +51,6 @@ public class FileDaoImpl implements FileDao {
             session.remove(file);
             session.flush();
 
-            session.getTransaction().commit();
-
             return false;
         } catch (Exception e){
             throw new RuntimeException("Error delete entity!");
@@ -83,15 +61,11 @@ public class FileDaoImpl implements FileDao {
     public File update(File entity) {
         try(Session session = HibernateUtil.openSession()){
 
-            session.beginTransaction();
-
             if (entity == null){
                 throw new RuntimeException("File not found!");
             }
-            session.merge(entity);
-//            session.saveOrUpdate(entity);
 
-            session.getTransaction().commit();
+            session.merge(entity);
 
             return entity;
         } catch (Exception e){
@@ -103,11 +77,7 @@ public class FileDaoImpl implements FileDao {
     public File save(File entity) {
         try(Session session = HibernateUtil.openSession()){
 
-            session.beginTransaction();
-
             session.persist(entity);
-
-            session.getTransaction().commit();
 
             return entity;
         } catch (Exception e){

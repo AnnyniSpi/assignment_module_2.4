@@ -5,7 +5,11 @@ import lombok.*;
 
 import java.util.List;
 
-@ToString(exclude = {"events"})
+@NamedEntityGraph(
+        name = "graph.userEvents",
+        attributeNodes = @NamedAttributeNode("events")
+)
+//@ToString(exclude = {"events"})
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
@@ -21,12 +25,4 @@ public class User {
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
     private List<Event> events;
-
-    public void addEvent(Event event){
-        this.events.add(event);
-    }
-
-    public void removeEvent(Event event){
-        this.events.remove(event);
-    }
 }
